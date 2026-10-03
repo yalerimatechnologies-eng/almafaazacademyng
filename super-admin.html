@@ -1,0 +1,2309 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="robots" content="noindex, nofollow" />
+<meta name="color-scheme" content="dark light" />
+<meta name="theme-color" content="#0A0A0A" />
+<title>Dashboard · ALMAFAAZ ACADEMY</title>
+<link rel="icon" href="assets/images/logo.png" type="image/png" />
+
+<script>
+/* Apply theme before first paint */
+(function(){
+  try{
+    var saved = localStorage.getItem('almafaaz.theme');
+    var prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+    var prefersDark  = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    var theme = saved === 'light' || saved === 'dark' ? saved
+              : (prefersLight ? 'light' : prefersDark ? 'dark' : 'dark');
+    document.documentElement.setAttribute('data-theme', theme);
+  } catch(e){ document.documentElement.setAttribute('data-theme','dark'); }
+})();
+</script>
+
+<style>
+/* ============================================================
+   ALMAFAAZ — Design Tokens
+   ============================================================ */
+:root,
+[data-theme="dark"]{
+  --canvas:       #0A0A0A;
+  --surface:      #111214;
+  --surface-2:    #17191C;
+  --surface-3:    #1E2125;
+  --surface-hover:#22262B;
+  --line:         #232629;
+  --line-2:       #2C3034;
+  --text:         #F5F6F7;
+  --text-2:       #B4B8BC;
+  --text-3:       #7A8085;
+  --text-4:       #4E5358;
+  --orange:       #FF6B00;
+  --orange-hot:   #FF8A2B;
+  --orange-deep:  #D95400;
+  --orange-soft:  rgba(255,107,0,.12);
+  --orange-glow:  rgba(255,107,0,.20);
+  --green:        #1E9E4A;
+  --green-hot:    #34B85E;
+  --green-soft:   rgba(30,158,74,.12);
+  --danger:       #E5484D;
+  --danger-soft:  rgba(229,72,77,.12);
+  --warning:      #E8A13A;
+  --warning-soft: rgba(232,161,58,.12);
+  --info:         #4A9DDB;
+  --info-soft:    rgba(74,157,219,.12);
+  --backdrop:     rgba(0,0,0,.72);
+  --shadow-card:  0 1px 0 rgba(255,255,255,.03) inset, 0 20px 40px -20px rgba(0,0,0,.7);
+  --shadow-lg:    0 40px 80px -20px rgba(0,0,0,.85);
+  --shadow-modal: 0 50px 100px -20px rgba(0,0,0,.9), 0 30px 60px -20px rgba(0,0,0,.7);
+}
+[data-theme="light"]{
+  --canvas:       #F6F3EE;
+  --surface:      #FFFFFF;
+  --surface-2:    #F4F0E8;
+  --surface-3:    #FAF7F1;
+  --surface-hover:#EDE7DA;
+  --line:         #E5DFD3;
+  --line-2:       #D3CCBE;
+  --text:         #14110D;
+  --text-2:       #4A4339;
+  --text-3:       #7A7365;
+  --text-4:       #A69F92;
+  --orange:       #E85D00;
+  --orange-hot:   #FF7A1F;
+  --orange-deep:  #B84800;
+  --orange-soft:  rgba(232,93,0,.10);
+  --orange-glow:  rgba(232,93,0,.18);
+  --green:        #17803B;
+  --green-hot:    #1E9E4A;
+  --green-soft:   rgba(23,128,59,.10);
+  --danger:       #B8342C;
+  --danger-soft:  rgba(184,52,44,.10);
+  --warning:      #B4730A;
+  --warning-soft: rgba(180,115,10,.10);
+  --info:         #2C6FA6;
+  --info-soft:    rgba(44,111,166,.10);
+  --backdrop:     rgba(20,17,13,.5);
+  --shadow-card:  0 1px 0 rgba(255,255,255,.9) inset, 0 20px 40px -20px rgba(20,17,13,.15);
+  --shadow-lg:    0 40px 80px -20px rgba(20,17,13,.25);
+  --shadow-modal: 0 40px 80px -20px rgba(20,17,13,.35), 0 20px 50px -20px rgba(20,17,13,.25);
+}
+:root{
+  --r-xs: 4px; --r-sm: 6px; --r: 10px; --r-lg: 14px; --r-xl: 20px;
+  --sidebar-w: 264px;
+  --header-h:  64px;
+  --font: Calibri, "Segoe UI", -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+  --font-mono: Consolas, Monaco, "Courier New", monospace;
+  --ease: cubic-bezier(.22,.61,.36,1);
+}
+*,*::before,*::after{ box-sizing:border-box; }
+html,body{ height:100%; margin:0; }
+body{
+  font-family:var(--font);
+  font-size:15px;
+  line-height:1.5;
+  color:var(--text);
+  background:var(--canvas);
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  transition: background .3s var(--ease), color .3s var(--ease);
+}
+button{ font-family:inherit; cursor:pointer; }
+input,select,textarea{ font-family:inherit; }
+a{ color:var(--orange); text-decoration:none; }
+a:hover{ text-decoration:underline; }
+:focus-visible{ outline:2px solid var(--orange); outline-offset:2px; border-radius:var(--r-xs); }
+.skip-link{
+  position:absolute; top:-100px; left:8px; z-index:9999;
+  padding:10px 16px; background:var(--orange); color:#fff;
+  border-radius:var(--r-sm); font-weight:700; transition: top .2s;
+}
+.skip-link:focus{ top:8px; }
+
+/* LAYOUT */
+.app{ display:grid; grid-template-columns: var(--sidebar-w) 1fr; min-height:100vh; min-height:100dvh; }
+
+/* SIDEBAR */
+.sidebar{
+  background:var(--surface);
+  border-right:1px solid var(--line);
+  display:flex; flex-direction:column;
+  height:100vh; height:100dvh;
+  position:sticky; top:0; overflow:hidden;
+  transition: background .3s var(--ease), border-color .3s var(--ease);
+}
+.sidebar-brand{
+  display:flex; align-items:center; gap:12px;
+  padding:18px 20px; border-bottom:1px solid var(--line);
+  min-height:var(--header-h); flex-shrink:0;
+}
+.sidebar-brand .logo{
+  width:38px; height:38px; border-radius:9px;
+  background:var(--surface-2); border:1px solid var(--line-2);
+  display:grid; place-items:center; overflow:hidden; flex-shrink:0;
+}
+.sidebar-brand .logo img{ width:70%; height:70%; object-fit:contain; display:block; }
+.sidebar-brand .logo .fallback{ font-size:18px; font-weight:800; color:var(--orange); }
+.sidebar-brand .name{ display:flex; flex-direction:column; min-width:0; line-height:1.15; }
+.sidebar-brand .name strong{
+  font-size:13px; font-weight:800; letter-spacing:.14em; color:var(--text);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.sidebar-brand .name span{
+  font-size:10px; letter-spacing:.20em; text-transform:uppercase;
+  color:var(--text-3); font-weight:600; margin-top:3px;
+}
+.sidebar-nav{
+  flex:1; overflow-y:auto; padding:14px 10px 20px;
+  scrollbar-width:thin; scrollbar-color: var(--line-2) transparent;
+}
+.sidebar-nav::-webkit-scrollbar{ width:6px; }
+.sidebar-nav::-webkit-scrollbar-thumb{ background:var(--line-2); border-radius:3px; }
+.nav-group{ margin-bottom:6px; }
+.nav-group-btn{
+  appearance:none; width:100%; display:flex; align-items:center; gap:12px;
+  padding:10px 12px; background:transparent; border:0; border-radius:var(--r-sm);
+  color:var(--text-2); font-size:11px; font-weight:800; letter-spacing:.14em;
+  text-transform:uppercase; text-align:left; transition: color .15s, background .15s;
+}
+.nav-group-btn:hover{ background:var(--surface-2); color:var(--text); }
+.nav-group-btn .chev{
+  margin-left:auto; width:14px; height:14px;
+  stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round;
+  transition: transform .2s var(--ease); opacity:.5;
+}
+.nav-group-btn[aria-expanded="true"] .chev{ transform: rotate(90deg); opacity:1; }
+.nav-items{
+  display:flex; flex-direction:column; gap:2px; padding:2px 0 4px;
+  overflow:hidden; max-height:0; transition: max-height .3s var(--ease);
+}
+.nav-group[data-open="true"] .nav-items{ max-height:1000px; }
+.nav-item{
+  appearance:none; width:100%; display:flex; align-items:center; gap:12px;
+  padding:9px 12px 9px 14px; background:transparent; border:0;
+  border-radius:var(--r-sm); color:var(--text-2); font-size:13.5px; font-weight:600;
+  text-align:left; cursor:pointer; transition: color .15s, background .15s;
+  position:relative; text-decoration:none;
+}
+.nav-item:hover{ background:var(--surface-2); color:var(--text); text-decoration:none; }
+.nav-item.active{ background:var(--orange-soft); color:var(--orange); }
+.nav-item.active::before{
+  content:""; position:absolute; left:0; top:20%; bottom:20%;
+  width:3px; background:var(--orange); border-radius:0 2px 2px 0;
+}
+.nav-item .ico{
+  width:18px; height:18px; stroke:currentColor; fill:none;
+  stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; flex-shrink:0;
+}
+.nav-item .label{ flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.sidebar-foot{ padding:14px; border-top:1px solid var(--line); flex-shrink:0; }
+.sidebar-foot .session-chip{
+  display:flex; align-items:center; gap:10px;
+  padding:10px 12px; background:var(--surface-2);
+  border:1px solid var(--line-2); border-radius:var(--r);
+}
+.sidebar-foot .session-chip .dot{
+  width:7px; height:7px; border-radius:50%;
+  background:var(--green-hot); box-shadow: 0 0 0 3px var(--green-soft); flex-shrink:0;
+}
+.sidebar-foot .session-chip .txt{ display:flex; flex-direction:column; min-width:0; line-height:1.3; }
+.sidebar-foot .session-chip .txt strong{ font-size:11px; color:var(--text); letter-spacing:.04em; font-weight:700; }
+.sidebar-foot .session-chip .txt span{
+  font-size:10px; color:var(--text-3); letter-spacing:.06em; text-transform:uppercase;
+  font-weight:600; margin-top:2px;
+}
+
+/* MAIN COLUMN */
+.main-col{ display:flex; flex-direction:column; min-width:0; min-height:100vh; min-height:100dvh; }
+.header{
+  position:sticky; top:0; z-index:50; height:var(--header-h);
+  display:flex; align-items:center; gap:14px; padding:0 22px;
+  background:var(--surface); border-bottom:1px solid var(--line);
+  transition: background .3s var(--ease), border-color .3s var(--ease);
+}
+.menu-btn{
+  display:none; appearance:none; width:40px; height:40px;
+  border-radius:var(--r-sm); background:transparent; border:1px solid var(--line-2);
+  color:var(--text-2); place-items:center;
+}
+.menu-btn:hover{ color:var(--text); background:var(--surface-2); }
+.menu-btn svg{ width:18px; height:18px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; }
+.header-titles{ display:flex; flex-direction:column; min-width:0; line-height:1.2; }
+.header-titles .crumb{ font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--text-3); font-weight:700; }
+.header-titles h1{
+  margin:2px 0 0; font-size:17px; font-weight:700; color:var(--text);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:min(60vw, 480px);
+}
+.header-search{ flex:1; max-width:380px; margin-left:20px; position:relative; }
+.header-search input{
+  width:100%; height:38px; padding:0 12px 0 38px;
+  border-radius:var(--r); background:var(--surface-2); border:1px solid var(--line-2);
+  color:var(--text); font-size:13.5px; outline:none;
+  transition: border-color .15s, background .15s, box-shadow .15s;
+}
+.header-search input::placeholder{ color:var(--text-4); }
+.header-search input:focus{ border-color:var(--orange); background:var(--surface); box-shadow: 0 0 0 3px var(--orange-glow); }
+.header-search .sicon{
+  position:absolute; left:12px; top:50%; transform:translateY(-50%);
+  width:16px; height:16px; stroke:var(--text-3); fill:none;
+  stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; pointer-events:none;
+}
+.header-search kbd{
+  position:absolute; right:8px; top:50%; transform:translateY(-50%);
+  padding:2px 7px; border-radius:var(--r-xs); border:1px solid var(--line-2);
+  background:var(--surface); font-family:var(--font-mono); font-size:10px;
+  color:var(--text-3); font-weight:600;
+}
+.header-actions{ display:flex; align-items:center; gap:6px; margin-left:auto; }
+.icon-button{
+  appearance:none; width:38px; height:38px; border-radius:var(--r-sm);
+  background:transparent; border:1px solid transparent; color:var(--text-2);
+  display:grid; place-items:center;
+  transition: color .15s, background .15s, border-color .15s; position:relative;
+}
+.icon-button:hover{ color:var(--text); background:var(--surface-2); border-color:var(--line-2); }
+.icon-button svg{ width:18px; height:18px; stroke:currentColor; fill:none; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+.profile-trigger{
+  display:flex; align-items:center; gap:10px; padding:5px 12px 5px 5px;
+  border-radius:999px; background:transparent; border:1px solid var(--line-2);
+  color:var(--text); transition: background .15s, border-color .15s; margin-left:8px;
+}
+.profile-trigger:hover{ background:var(--surface-2); border-color:var(--orange); }
+.profile-trigger .avatar{
+  width:30px; height:30px; border-radius:50%;
+  background:linear-gradient(135deg, var(--orange), var(--orange-deep));
+  color:#fff; display:grid; place-items:center; font-weight:800;
+  font-size:12px; letter-spacing:.02em; flex-shrink:0;
+}
+.profile-trigger .who{ display:flex; flex-direction:column; line-height:1.15; min-width:0; max-width:160px; }
+.profile-trigger .who strong{ font-size:12.5px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.profile-trigger .who span{
+  font-size:10px; color:var(--text-3); font-weight:600; letter-spacing:.06em;
+  text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+
+/* WORKSPACE */
+.workspace{ flex:1; padding:24px 26px 40px; min-width:0; overflow-x:hidden; }
+.page-head{ display:flex; align-items:flex-start; justify-content:space-between; gap:20px; flex-wrap:wrap; margin-bottom:24px; }
+.page-head .left{ display:flex; flex-direction:column; gap:6px; min-width:0; }
+.page-head .eyebrow{
+  display:inline-flex; align-items:center; gap:8px;
+  font-size:11px; letter-spacing:.20em; text-transform:uppercase;
+  font-weight:800; color:var(--orange);
+}
+.page-head .eyebrow .live{
+  width:6px; height:6px; border-radius:50%; background:var(--green-hot);
+  animation: pulse 2s var(--ease) infinite;
+}
+@keyframes pulse{
+  0%  { box-shadow: 0 0 0 0 rgba(30,158,74,.55); }
+  70% { box-shadow: 0 0 0 10px rgba(30,158,74,0); }
+  100%{ box-shadow: 0 0 0 0 rgba(30,158,74,0); }
+}
+.page-head h2{
+  margin:0; font-size:clamp(20px, 2.4vw, 26px);
+  font-weight:800; color:var(--text); letter-spacing:-.005em; line-height:1.2;
+}
+.page-head .sub{ margin:0; font-size:14px; color:var(--text-2); line-height:1.5; max-width:60ch; }
+.page-head .right{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.btn{
+  appearance:none; display:inline-flex; align-items:center; gap:8px;
+  height:38px; padding:0 16px; border-radius:var(--r);
+  font-size:13.5px; font-weight:700; letter-spacing:.01em;
+  border:1px solid transparent;
+  transition: background .15s, border-color .15s, color .15s, transform .06s;
+  text-decoration:none; white-space:nowrap;
+}
+.btn:active{ transform: translateY(1px); }
+.btn svg{ width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
+.btn-primary{
+  background:var(--orange); border-color:var(--orange); color:#fff;
+  box-shadow: 0 6px 18px -8px rgba(255,107,0,.5);
+}
+.btn-primary:hover{ background:var(--orange-hot); border-color:var(--orange-hot); text-decoration:none; }
+.btn-ghost{ background:var(--surface); border-color:var(--line-2); color:var(--text); }
+.btn-ghost:hover{ border-color:var(--orange); color:var(--orange); text-decoration:none; }
+.btn-danger{
+  background:var(--danger); border-color:var(--danger); color:#fff;
+}
+.btn-danger:hover{ background:var(--danger); border-color:var(--danger); opacity:.9; }
+.btn-sm{ height:32px; padding:0 12px; font-size:12.5px; }
+.btn[disabled]{ opacity:.55; cursor:not-allowed; }
+
+/* METRICS */
+.metrics{ display:grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap:14px; margin-bottom:24px; }
+@media (max-width:1200px){ .metrics{ grid-template-columns: repeat(3, 1fr); } }
+@media (max-width:720px){ .metrics{ grid-template-columns: repeat(2, 1fr); } }
+@media (max-width:420px){ .metrics{ grid-template-columns: 1fr; } }
+.metric{
+  background:var(--surface); border:1px solid var(--line); border-radius:var(--r-lg);
+  padding:16px 18px; display:flex; flex-direction:column; gap:12px;
+  position:relative; overflow:hidden; transition: border-color .15s, transform .15s;
+}
+.metric:hover{ border-color:var(--line-2); }
+.metric .head{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.metric .head .label{
+  font-size:11px; letter-spacing:.16em; text-transform:uppercase;
+  font-weight:800; color:var(--text-3);
+}
+.metric .head .ico-wrap{
+  width:32px; height:32px; border-radius:8px; display:grid; place-items:center;
+  background:var(--orange-soft); color:var(--orange);
+}
+.metric .head .ico-wrap svg{
+  width:16px; height:16px; stroke:currentColor; fill:none;
+  stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round;
+}
+.metric.green .ico-wrap{ background:var(--green-soft); color:var(--green); }
+.metric.info .ico-wrap{ background:var(--info-soft); color:var(--info); }
+.metric.warning .ico-wrap{ background:var(--warning-soft); color:var(--warning); }
+.metric .value{ font-size:30px; font-weight:800; color:var(--text); line-height:1; letter-spacing:-.01em; }
+.metric .value.muted{ color:var(--text-3); font-size:24px; }
+.metric .foot{ font-size:12px; color:var(--text-3); font-weight:600; }
+.metric.loading .value{
+  display:inline-block; width:70px; height:30px; border-radius:6px;
+  background: linear-gradient(90deg, var(--surface-2) 25%, var(--surface-3) 50%, var(--surface-2) 75%);
+  background-size: 200% 100%; animation: shimmer 1.4s infinite;
+}
+@keyframes shimmer{ 0%{ background-position: 200% 0; } 100%{ background-position: -200% 0; } }
+@media (prefers-reduced-motion: reduce){
+  .metric.loading .value{ animation:none; background:var(--surface-2); }
+  .page-head .eyebrow .live{ animation:none; }
+}
+
+/* CONTENT GRID */
+.content-grid{ display:grid; grid-template-columns: 2fr 1fr; gap:20px; align-items:start; }
+@media (max-width:1024px){ .content-grid{ grid-template-columns: 1fr; } }
+.panel{
+  background:var(--surface); border:1px solid var(--line);
+  border-radius:var(--r-lg); overflow:hidden; transition: border-color .15s;
+}
+.panel-head{
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  padding:16px 20px; border-bottom:1px solid var(--line);
+}
+.panel-head .titles h3{ margin:0; font-size:14px; font-weight:800; color:var(--text); letter-spacing:.005em; }
+.panel-head .titles p{ margin:4px 0 0; font-size:12.5px; color:var(--text-3); }
+.panel-head .actions{ display:flex; align-items:center; gap:6px; }
+.panel-body{ padding:20px; }
+.panel-body.flush{ padding:0; }
+
+/* EMPTY STATE */
+.empty{ text-align:center; padding:36px 24px; }
+.empty .ico-wrap{
+  width:56px; height:56px; border-radius:14px; background:var(--surface-2);
+  border:1px solid var(--line-2); color:var(--text-3);
+  display:grid; place-items:center; margin:0 auto 16px;
+}
+.empty .ico-wrap svg{
+  width:24px; height:24px; stroke:currentColor; fill:none;
+  stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round;
+}
+.empty h4{ margin:0 0 6px; font-size:14px; font-weight:700; color:var(--text); }
+.empty p{ margin:0 auto 16px; font-size:13px; color:var(--text-3); max-width:36ch; line-height:1.55; }
+
+/* ACTIVITY / QUICK ACTIONS / STATUS */
+.activity-list{ display:flex; flex-direction:column; }
+.activity-row{
+  display:flex; gap:14px; padding:14px 20px;
+  border-bottom:1px solid var(--line); align-items:flex-start;
+}
+.activity-row:last-child{ border-bottom:0; }
+.activity-row .dot-col{ display:flex; flex-direction:column; align-items:center; gap:8px; padding-top:4px; }
+.activity-row .dot-col .dot{ width:8px; height:8px; border-radius:50%; background:var(--orange); flex-shrink:0; }
+.activity-row .text{ flex:1; min-width:0; }
+.activity-row .text .line{ font-size:13px; color:var(--text); font-weight:600; line-height:1.45; }
+.activity-row .text .line .actor{ color:var(--orange); font-weight:700; }
+.activity-row .text .line .target{ color:var(--text); font-weight:700; }
+.activity-row .text .meta{
+  display:flex; align-items:center; gap:8px; margin-top:4px;
+  font-size:11.5px; color:var(--text-3); font-weight:600; letter-spacing:.02em;
+}
+.activity-row .text .meta .sep{ width:3px; height:3px; border-radius:50%; background:var(--text-4); }
+.qa-grid{ display:grid; grid-template-columns: repeat(2, 1fr); gap:10px; }
+@media (max-width:520px){ .qa-grid{ grid-template-columns: 1fr; } }
+.qa{
+  appearance:none; display:flex; align-items:center; gap:12px; padding:12px 14px;
+  background:var(--surface-2); border:1px solid var(--line-2);
+  border-radius:var(--r); color:var(--text); text-align:left;
+  transition: border-color .15s, background .15s, transform .08s;
+}
+.qa:hover{ border-color:var(--orange); background:var(--surface-3); }
+.qa:active{ transform: translateY(1px); }
+.qa .ico{
+  width:32px; height:32px; border-radius:8px;
+  background:var(--orange-soft); color:var(--orange);
+  display:grid; place-items:center; flex-shrink:0;
+}
+.qa .ico svg{ width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+.qa .label{ font-size:13px; font-weight:700; color:var(--text); line-height:1.3; }
+.status-list{ display:flex; flex-direction:column; }
+.status-row{
+  display:flex; align-items:center; gap:12px; padding:12px 20px;
+  border-bottom:1px solid var(--line);
+}
+.status-row:last-child{ border-bottom:0; }
+.status-row .dot{ width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.status-row .dot.green{ background:var(--green-hot); box-shadow: 0 0 0 3px var(--green-soft); }
+.status-row .dot.orange{ background:var(--orange); box-shadow: 0 0 0 3px var(--orange-soft); }
+.status-row .dot.gray{ background:var(--text-4); }
+.status-row .text{ flex:1; font-size:13px; color:var(--text); font-weight:600; }
+.status-row .state{
+  font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--text-3); font-weight:800;
+}
+.status-row .state.ok{ color:var(--green); }
+.status-row .state.warn{ color:var(--warning); }
+.section-title{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin:28px 0 14px; }
+.section-title h3{ margin:0; font-size:15px; font-weight:800; color:var(--text); letter-spacing:.02em; }
+.section-title h3 .accent{
+  display:inline-block; width:4px; height:14px;
+  background:var(--orange); border-radius:2px; margin-right:10px; vertical-align:middle;
+}
+
+/* ============================================================
+   REUSABLE MODAL SYSTEM
+   ============================================================ */
+.modal{
+  position:fixed; inset:0; z-index:1000;
+  display:flex; align-items:center; justify-content:center;
+  padding:24px;
+  visibility:hidden; pointer-events:none;
+}
+.modal.open{ visibility:visible; pointer-events:auto; }
+.modal .modal-backdrop{
+  position:absolute; inset:0; background:var(--backdrop);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  opacity:0; transition: opacity .22s var(--ease);
+}
+.modal.open .modal-backdrop{ opacity:1; }
+.modal .modal-dialog{
+  position:relative; z-index:1;
+  width:100%; max-width:560px;
+  max-height:min(88vh, 760px);
+  background:var(--surface); border:1px solid var(--line-2);
+  border-radius:var(--r-lg); box-shadow: var(--shadow-modal);
+  display:flex; flex-direction:column; overflow:hidden;
+  opacity:0; transform: translateY(14px) scale(.985);
+  transition: opacity .22s var(--ease), transform .22s var(--ease);
+}
+.modal.open .modal-dialog{ opacity:1; transform: translateY(0) scale(1); }
+.modal.modal-sm .modal-dialog{ max-width:420px; }
+.modal-head{
+  display:flex; align-items:flex-start; justify-content:space-between;
+  gap:16px; padding:20px 22px 16px; border-bottom:1px solid var(--line);
+}
+.modal-head .ttl h3{ margin:0 0 4px; font-size:16px; font-weight:800; color:var(--text); }
+.modal-head .ttl p{ margin:0; font-size:13px; color:var(--text-3); line-height:1.5; }
+.modal-close{
+  appearance:none; width:32px; height:32px; border-radius:50%;
+  background:transparent; border:1px solid var(--line-2); color:var(--text-3);
+  display:grid; place-items:center; flex-shrink:0;
+  transition: color .15s, border-color .15s, background .15s;
+}
+.modal-close:hover{ color:var(--orange); border-color:var(--orange); background:var(--orange-soft); }
+.modal-close svg{ width:14px; height:14px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; }
+.modal-body{ padding:22px; overflow-y:auto; flex:1; }
+.modal-foot{
+  display:flex; align-items:center; justify-content:flex-end; gap:8px;
+  padding:14px 22px 20px; border-top:1px solid var(--line);
+  background:var(--surface-2);
+}
+
+/* ============================================================
+   REUSABLE FORM SYSTEM
+   ============================================================ */
+.form-row{ margin-bottom:18px; }
+.form-row:last-child{ margin-bottom:0; }
+.form-grid{
+  display:grid; grid-template-columns: repeat(2, 1fr); gap:16px;
+}
+@media (max-width:520px){ .form-grid{ grid-template-columns: 1fr; } }
+.form-label{
+  display:block; font-size:12px; letter-spacing:.14em; text-transform:uppercase;
+  font-weight:700; color:var(--text-2); margin-bottom:8px;
+}
+.form-label .req{ color:var(--orange); margin-left:3px; }
+.form-help{ margin-top:6px; font-size:12px; color:var(--text-3); line-height:1.5; }
+.form-input,
+.form-select,
+.form-textarea{
+  width:100%; padding:0 14px; height:44px;
+  border-radius:var(--r); background:var(--surface-2);
+  border:1px solid var(--line-2); color:var(--text);
+  font-size:14.5px; outline:none;
+  transition: border-color .15s, box-shadow .15s, background .15s;
+}
+.form-textarea{ padding:12px 14px; height:auto; min-height:96px; resize:vertical; line-height:1.5; }
+.form-select{
+  appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237A8085' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position: right 14px center; padding-right:38px;
+}
+.form-input:hover,
+.form-select:hover,
+.form-textarea:hover{ border-color:var(--text-4); }
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus{
+  border-color:var(--orange); background:var(--surface);
+  box-shadow: 0 0 0 3px var(--orange-glow);
+}
+.form-input.invalid,
+.form-select.invalid,
+.form-textarea.invalid{
+  border-color:var(--danger);
+  box-shadow: 0 0 0 3px var(--danger-soft);
+}
+.form-input::placeholder,
+.form-textarea::placeholder{ color:var(--text-4); }
+.form-error{
+  display:none; margin-top:6px; font-size:12.5px;
+  color:var(--danger); font-weight:600;
+}
+.form-error.show{ display:block; }
+.form-input[type="date"]::-webkit-calendar-picker-indicator{
+  filter: invert(0.6);
+  cursor:pointer;
+}
+[data-theme="light"] .form-input[type="date"]::-webkit-calendar-picker-indicator{ filter: none; }
+
+/* Toggle row (checkbox) */
+.toggle-row{
+  display:flex; align-items:flex-start; gap:12px; padding:14px;
+  border-radius:var(--r); background:var(--surface-2);
+  border:1px solid var(--line-2);
+}
+.toggle-row input[type="checkbox"]{
+  appearance:none; flex-shrink:0;
+  width:20px; height:20px; margin-top:2px;
+  border-radius:5px; border:1.5px solid var(--line-2);
+  background:var(--surface); display:inline-grid; place-items:center;
+  cursor:pointer; transition: border-color .15s, background .15s;
+}
+.toggle-row input[type="checkbox"]:checked{
+  background:var(--orange); border-color:var(--orange);
+}
+.toggle-row input[type="checkbox"]:checked::after{
+  content:""; width:10px; height:5px;
+  border-left:2.5px solid #fff; border-bottom:2.5px solid #fff;
+  transform: rotate(-45deg) translate(1px,-1px);
+}
+.toggle-row .txt{ flex:1; min-width:0; }
+.toggle-row .txt strong{ display:block; font-size:13.5px; font-weight:700; color:var(--text); margin-bottom:3px; }
+.toggle-row .txt span{ display:block; font-size:12.5px; color:var(--text-3); line-height:1.5; }
+
+/* ============================================================
+   REUSABLE TABLE SYSTEM
+   ============================================================ */
+.table-wrap{ overflow-x:auto; }
+.table{
+  width:100%; border-collapse:collapse; font-size:14px;
+  min-width:520px;
+}
+.table thead th{
+  text-align:left; padding:12px 16px;
+  font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+  font-weight:800; color:var(--text-3);
+  background:var(--surface-2);
+  border-bottom:1px solid var(--line);
+  white-space:nowrap;
+}
+.table tbody td{
+  padding:14px 16px;
+  border-bottom:1px solid var(--line);
+  color:var(--text); vertical-align:middle;
+}
+.table tbody tr:last-child td{ border-bottom:0; }
+.table tbody tr:hover td{ background:var(--surface-2); }
+.table .actions{ display:flex; gap:6px; justify-content:flex-end; }
+.table .actions button{
+  appearance:none; height:28px; padding:0 10px;
+  border-radius:var(--r-sm); border:1px solid var(--line-2);
+  background:transparent; color:var(--text-2);
+  font-size:12px; font-weight:600;
+  transition: color .15s, border-color .15s, background .15s;
+}
+.table .actions button:hover{ color:var(--text); border-color:var(--text-4); background:var(--surface); }
+.table .actions button.danger:hover{ color:var(--danger); border-color:var(--danger); }
+.table .actions button.primary{ color:var(--orange); border-color:rgba(255,107,0,.35); }
+.table .actions button.primary:hover{ background:var(--orange-soft); border-color:var(--orange); }
+
+/* ============================================================
+   BADGES
+   ============================================================ */
+.badge{
+  display:inline-flex; align-items:center; gap:6px;
+  padding:3px 10px; border-radius:999px;
+  font-size:11px; font-weight:800; letter-spacing:.06em; text-transform:uppercase;
+  border:1px solid transparent; white-space:nowrap;
+}
+.badge .bdot{ width:6px; height:6px; border-radius:50%; }
+.badge.active{ background:var(--green-soft); color:var(--green); border-color:rgba(30,158,74,.35); }
+.badge.active .bdot{ background:var(--green-hot); }
+.badge.inactive{ background:var(--surface-2); color:var(--text-3); border-color:var(--line-2); }
+.badge.inactive .bdot{ background:var(--text-4); }
+.badge.info{ background:var(--info-soft); color:var(--info); border-color:rgba(74,157,219,.35); }
+.badge.warning{ background:var(--warning-soft); color:var(--warning); border-color:rgba(232,161,58,.35); }
+.badge.orange{ background:var(--orange-soft); color:var(--orange); border-color:rgba(255,107,0,.35); }
+
+/* ============================================================
+   SESSION CARDS (Academic Sessions module)
+   ============================================================ */
+.sessions-list{ display:flex; flex-direction:column; gap:14px; }
+.session-card{
+  background:var(--surface); border:1px solid var(--line);
+  border-radius:var(--r-lg); overflow:hidden;
+  transition: border-color .15s;
+}
+.session-card:hover{ border-color:var(--line-2); }
+.session-card.is-active{ border-color:rgba(255,107,0,.35); }
+.session-head{
+  display:flex; align-items:center; gap:16px;
+  padding:18px 20px; border-bottom:1px solid var(--line);
+  flex-wrap:wrap;
+}
+.session-head .left{ flex:1; min-width:220px; }
+.session-head .name{
+  font-size:18px; font-weight:800; color:var(--text);
+  letter-spacing:-.005em; line-height:1.2; margin:0 0 6px;
+  display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+}
+.session-head .dates{
+  font-size:12.5px; color:var(--text-3); font-weight:600;
+  letter-spacing:.02em;
+}
+.session-head .dates .sep{ margin:0 6px; color:var(--text-4); }
+.session-head .right{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.session-terms{ padding:6px 20px 18px; background:var(--surface); }
+.session-terms-head{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:12px; padding:14px 0 8px;
+  border-top:1px dashed var(--line);
+  margin-top:8px;
+}
+.session-terms-head .label{
+  font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+  font-weight:800; color:var(--text-3);
+}
+.terms-grid{ display:flex; flex-direction:column; gap:8px; }
+.term-row{
+  display:flex; align-items:center; gap:14px;
+  padding:12px 14px; border-radius:var(--r);
+  background:var(--surface-2); border:1px solid var(--line-2);
+  transition: border-color .15s, background .15s;
+}
+.term-row:hover{ border-color:var(--text-4); }
+.term-row.is-active{ border-color:rgba(255,107,0,.35); background:var(--orange-soft); }
+.term-row .left{ flex:1; min-width:0; }
+.term-row .name{
+  font-size:14.5px; font-weight:700; color:var(--text);
+  display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  margin:0 0 3px; line-height:1.3;
+}
+.term-row .dates{ font-size:12px; color:var(--text-3); font-weight:600; }
+.term-row .right{ display:flex; gap:6px; align-items:center; }
+
+/* ============================================================
+   LOADING BAR (in-page refresh)
+   ============================================================ */
+.refresh-bar{
+  height:2px; background:transparent; margin-bottom:16px;
+  overflow:hidden; border-radius:2px;
+  opacity:0; transition: opacity .2s;
+}
+.refresh-bar.show{ opacity:1; }
+.refresh-bar .fill{
+  height:100%; width:30%;
+  background:linear-gradient(90deg, transparent, var(--orange), transparent);
+  animation: refbar 1.2s linear infinite;
+}
+@keyframes refbar{
+  0%  { transform: translateX(-100%); }
+  100%{ transform: translateX(400%); }
+}
+
+/* MOBILE DRAWER */
+.drawer-backdrop{
+  position:fixed; inset:0; z-index:200; background:rgba(0,0,0,.55);
+  backdrop-filter: blur(4px);
+  opacity:0; visibility:hidden; transition: opacity .25s var(--ease), visibility .25s;
+}
+.drawer-backdrop.open{ opacity:1; visibility:visible; }
+@media (max-width:900px){
+  .app{ grid-template-columns: 1fr; }
+  .sidebar{
+    position:fixed; top:0; left:0; bottom:0;
+    width:min(86vw, 300px); z-index:210;
+    transform: translateX(-100%);
+    transition: transform .28s var(--ease);
+    box-shadow: 8px 0 40px rgba(0,0,0,.5);
+  }
+  .sidebar.open{ transform: translateX(0); }
+  .menu-btn{ display:grid; }
+}
+@media (max-width:640px){
+  :root{ --header-h: 60px; }
+  .workspace{ padding:16px 14px 32px; }
+  .header{ padding:0 14px; gap:10px; }
+  .header-search{ display:none; }
+  .profile-trigger .who{ display:none; }
+  .profile-trigger{ padding:5px; gap:0; margin-left:4px; }
+  .header-titles h1{ font-size:15px; }
+  .page-head h2{ font-size:20px; }
+  .panel-body{ padding:16px; }
+  .metric .value{ font-size:24px; }
+  .metric .value.muted{ font-size:20px; }
+  .session-head{ padding:16px; }
+  .session-terms{ padding:6px 16px 16px; }
+  .term-row{ padding:10px 12px; gap:10px; }
+  .modal{ padding:14px; }
+  .modal-head{ padding:16px 16px 14px; }
+  .modal-body{ padding:16px; }
+  .modal-foot{ padding:12px 16px 16px; }
+}
+
+/* PROFILE MENU */
+.profile-menu{
+  position:fixed; top:calc(var(--header-h) - 4px); right:18px;
+  z-index:300; min-width:240px;
+  background:var(--surface); border:1px solid var(--line-2);
+  border-radius:var(--r); box-shadow: var(--shadow-lg); padding:6px;
+  opacity:0; visibility:hidden; transform: translateY(-6px);
+  transition: opacity .15s var(--ease), visibility .15s, transform .15s var(--ease);
+}
+.profile-menu.open{ opacity:1; visibility:visible; transform: translateY(0); }
+.profile-menu .menu-head{ padding:10px 12px; border-bottom:1px solid var(--line); margin-bottom:6px; }
+.profile-menu .menu-head strong{
+  display:block; font-size:13px; font-weight:700; color:var(--text);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.profile-menu .menu-head span{
+  display:block; margin-top:2px; font-size:11.5px; color:var(--text-3);
+  font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.profile-menu .menu-item{
+  display:flex; align-items:center; gap:10px; padding:9px 12px;
+  border-radius:var(--r-sm); color:var(--text); font-size:13px; font-weight:600;
+  text-decoration:none; cursor:pointer; border:0; background:transparent;
+  width:100%; text-align:left;
+}
+.profile-menu .menu-item:hover{ background:var(--surface-2); color:var(--orange); text-decoration:none; }
+.profile-menu .menu-item svg{ width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+.profile-menu .menu-divider{ height:1px; background:var(--line); margin:6px 4px; }
+
+/* AUTH GATE */
+.auth-gate{
+  position:fixed; inset:0; z-index:9999;
+  display:flex; align-items:center; justify-content:center; background:var(--canvas);
+  transition: opacity .4s var(--ease), visibility .4s;
+}
+.auth-gate.done{ opacity:0; visibility:hidden; pointer-events:none; }
+.auth-gate .gate-inner{ display:flex; flex-direction:column; align-items:center; gap:18px; }
+.auth-gate .gate-ring{ position:relative; width:64px; height:64px; }
+.auth-gate .gate-ring::before,
+.auth-gate .gate-ring::after{
+  content:""; position:absolute; inset:0; border-radius:50%; border:3px solid transparent;
+}
+.auth-gate .gate-ring::before{
+  border-top-color:var(--orange); border-right-color:var(--orange);
+  animation: spin 1s linear infinite;
+}
+.auth-gate .gate-ring::after{
+  inset:10px; border-bottom-color:var(--green); border-left-color:var(--green);
+  animation: spin-r 1.4s linear infinite;
+}
+@keyframes spin  { to{ transform: rotate(360deg); } }
+@keyframes spin-r{ to{ transform: rotate(-360deg); } }
+.auth-gate .gate-text{
+  font-size:11px; letter-spacing:.32em; text-transform:uppercase;
+  color:var(--text-3); font-weight:700;
+}
+
+/* TOAST */
+.toast-host{
+  position:fixed; bottom:24px; right:24px; z-index:1500;
+  display:flex; flex-direction:column; gap:10px;
+  max-width:380px; pointer-events:none;
+}
+.toast{
+  pointer-events:auto;
+  display:flex; align-items:flex-start; gap:12px;
+  padding:14px 16px; border-radius:var(--r);
+  background:var(--surface); border:1px solid var(--line-2);
+  box-shadow: var(--shadow-lg); color:var(--text);
+  font-size:13.5px; line-height:1.5;
+  transform: translateY(20px); opacity:0;
+  transition: transform .25s var(--ease), opacity .25s var(--ease);
+}
+.toast.show{ transform: translateY(0); opacity:1; }
+.toast svg{ width:18px; height:18px; flex-shrink:0; margin-top:2px; }
+.toast.success{ border-color: rgba(30,158,74,.4); }
+.toast.success svg{ color: var(--green-hot); }
+.toast.error{ border-color: rgba(229,72,77,.4); }
+.toast.error svg{ color: var(--danger); }
+.toast.warning{ border-color: rgba(232,161,58,.4); }
+.toast.warning svg{ color: var(--warning); }
+.toast .msg{ flex:1; min-width:0; }
+.toast .msg strong{ display:block; font-weight:700; margin-bottom:2px; font-size:13.5px; }
+.toast .msg span{ color:var(--text-2); font-size:13px; }
+@media (max-width:640px){
+  .toast-host{ left:16px; right:16px; bottom:16px; max-width:none; }
+}
+</style>
+</head>
+<body>
+
+<a href="#workspace" class="skip-link">Skip to main content</a>
+
+<div class="auth-gate" id="auth-gate">
+  <div class="gate-inner">
+    <div class="gate-ring" aria-hidden="true"></div>
+    <div class="gate-text">Verifying session</div>
+  </div>
+</div>
+
+<div class="drawer-backdrop" id="drawer-backdrop" aria-hidden="true"></div>
+
+<div class="app" id="app" style="display:none;">
+
+  <aside class="sidebar" id="sidebar" aria-label="Primary navigation">
+    <div class="sidebar-brand">
+      <div class="logo" aria-hidden="true">
+        <img src="assets/images/logo.png" alt=""
+             onerror="this.style.display='none';this.parentNode.insertAdjacentHTML('beforeend','<span class=\'fallback\'>A</span>');" />
+      </div>
+      <div class="name">
+        <strong>ALMAFAAZ ACADEMY</strong>
+        <span>Management Centre</span>
+      </div>
+    </div>
+    <nav class="sidebar-nav" id="sidebar-nav"></nav>
+    <div class="sidebar-foot">
+      <div class="session-chip" title="Current academic context">
+        <span class="dot" aria-hidden="true"></span>
+        <span class="txt">
+          <strong id="session-name">No active session</strong>
+          <span id="session-term">Set up academics</span>
+        </span>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main-col">
+    <header class="header" role="banner">
+      <button class="menu-btn" id="menu-btn" type="button" aria-label="Open navigation">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+      <div class="header-titles">
+        <span class="crumb" id="crumb">Overview</span>
+        <h1 id="page-title">Dashboard</h1>
+      </div>
+      <div class="header-search">
+        <svg class="sicon" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="11" cy="11" r="7"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input type="search" id="global-search" placeholder="Search students, teachers, classes…"
+               aria-label="Global search" />
+        <kbd>/</kbd>
+      </div>
+      <div class="header-actions">
+        <button class="icon-button" id="theme-btn" type="button" aria-label="Change theme" title="Change theme">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+          </svg>
+        </button>
+        <button class="icon-button" id="notif-btn" type="button" aria-label="Notifications" title="Notifications">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/>
+            <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
+          </svg>
+        </button>
+        <button class="profile-trigger" id="profile-trigger" type="button"
+                aria-haspopup="menu" aria-expanded="false">
+          <span class="avatar" id="avatar-initials">SA</span>
+          <span class="who">
+            <strong id="profile-name">Super Admin</strong>
+            <span id="profile-role">Super Admin</span>
+          </span>
+        </button>
+      </div>
+    </header>
+
+    <div class="profile-menu" id="profile-menu" role="menu" aria-hidden="true">
+      <div class="menu-head">
+        <strong id="menu-name">Super Admin</strong>
+        <span id="menu-email">—</span>
+      </div>
+      <button type="button" class="menu-item" role="menuitem" data-nav="profile">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
+        My Profile
+      </button>
+      <button type="button" class="menu-item" role="menuitem" data-nav="settings">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
+        System Settings
+      </button>
+      <div class="menu-divider"></div>
+      <button type="button" class="menu-item" role="menuitem" id="theme-menu-item">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
+        <span id="theme-menu-label">Switch to light</span>
+      </button>
+      <div class="menu-divider"></div>
+      <button type="button" class="menu-item" role="menuitem" id="logout-btn" style="color:var(--danger);">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sign out
+      </button>
+    </div>
+
+    <main class="workspace" id="workspace" role="main"></main>
+  </div>
+</div>
+
+<!-- REUSABLE MODAL CONTAINER -->
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div class="modal-backdrop" data-close-modal></div>
+  <div class="modal-dialog" role="document">
+    <div class="modal-head">
+      <div class="ttl">
+        <h3 id="modal-title">Modal</h3>
+        <p id="modal-subtitle"></p>
+      </div>
+      <button type="button" class="modal-close" data-close-modal aria-label="Close">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-foot" id="modal-foot"></div>
+  </div>
+</div>
+
+<!-- TOAST HOST -->
+<div class="toast-host" id="toast-host" aria-live="polite" aria-atomic="true"></div>
+
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4';
+
+const SUPABASE_URL = 'https://vgudoawadoouvrnxlxsa.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_yk83WSYFRC29R6pHwfT5tw_KfhrLzlS';
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true,
+    storageKey: 'almafaaz.auth'
+  }
+});
+
+/* ============================================================
+   STATE
+   ============================================================ */
+const state = {
+  user: null,
+  profile: null,
+  route: 'dashboard',
+  sessionName: null,
+  termName: null,
+  sessions: [],
+  termsBySession: {},
+  sessionsLoading: false,
+  expandedSessions: new Set()
+};
+
+/* ============================================================
+   DOM
+   ============================================================ */
+const $ = (id) => document.getElementById(id);
+const app = $('app');
+const workspace = $('workspace');
+const sidebar = $('sidebar');
+const backdrop = $('drawer-backdrop');
+const menuBtn = $('menu-btn');
+const profileTrigger = $('profile-trigger');
+const profileMenu = $('profile-menu');
+const logoutBtn = $('logout-btn');
+const themeBtn = $('theme-btn');
+const themeMenuItem = $('theme-menu-item');
+const themeMenuLabel = $('theme-menu-label');
+const pageTitle = $('page-title');
+const crumb = $('crumb');
+const authGate = $('auth-gate');
+const searchInput = $('global-search');
+
+/* Modal refs */
+const modalEl     = $('modal');
+const modalTitle  = $('modal-title');
+const modalSub    = $('modal-subtitle');
+const modalBody   = $('modal-body');
+const modalFoot   = $('modal-foot');
+
+/* ============================================================
+   NAVIGATION
+   ============================================================ */
+const NAV = [
+  { id:'overview', label:'Overview', open:true, items:[
+    { id:'dashboard',     label:'Dashboard',      route:'dashboard',     icon:'home' },
+    { id:'notifications', label:'Notifications',  route:'notifications', icon:'bell' },
+    { id:'activity',      label:'Activity Log',   route:'audit-log',     icon:'activity' }
+  ]},
+  { id:'people', label:'People', items:[
+    { id:'students',        label:'Students',           route:'students',        icon:'users' },
+    { id:'teachers',        label:'Teachers',           route:'teachers',        icon:'teacher' },
+    { id:'staff',           label:'Staff',              route:'staff',           icon:'briefcase' },
+    { id:'administrators',  label:'Administrators',     route:'administrators',  icon:'shield' },
+    { id:'cbt-admins',      label:'CBT Administrators', route:'cbt-admins',      icon:'monitor' },
+    { id:'parents',         label:'Parents',            route:'parents',         icon:'family' }
+  ]},
+  { id:'academic', label:'Academic', items:[
+    { id:'classes',       label:'Classes & Arms',    route:'classes',       icon:'building' },
+    { id:'subjects',      label:'Subjects',          route:'subjects',      icon:'book' },
+    { id:'sessions',      label:'Academic Sessions', route:'sessions',      icon:'calendar' },
+    { id:'terms',         label:'Terms',             route:'terms',         icon:'calendar-check' },
+    { id:'timetable',     label:'Timetable',         route:'timetable',     icon:'calendar-grid' },
+    { id:'scheme',        label:'Scheme of Work',    route:'scheme',        icon:'file-text' },
+    { id:'attendance',    label:'Attendance',        route:'attendance',    icon:'check-square' },
+    { id:'examinations',  label:'Examinations',      route:'examinations',  icon:'file-check' },
+    { id:'results',       label:'Results',           route:'results',       icon:'bar-chart' },
+    { id:'assignments',   label:'Assignments',       route:'assignments',   icon:'clipboard' }
+  ]},
+  { id:'cbt', label:'CBT', items:[
+    { id:'cbt-dashboard', label:'CBT Dashboard',  route:'cbt',            icon:'monitor' },
+    { id:'cbt-questions', label:'Question Bank',  route:'cbt-questions',  icon:'database' },
+    { id:'cbt-exams',     label:'Examinations',   route:'cbt-exams',      icon:'file-check' },
+    { id:'cbt-candidates',label:'Candidates',     route:'cbt-candidates', icon:'users' },
+    { id:'cbt-results',   label:'CBT Results',    route:'cbt-results',    icon:'bar-chart' }
+  ]},
+  { id:'school', label:'School Management', items:[
+    { id:'school-profile', label:'School Profile',  route:'school-profile', icon:'building' },
+    { id:'announcements',  label:'Announcements',   route:'announcements',  icon:'megaphone' },
+    { id:'events',         label:'Events',          route:'events',         icon:'calendar' },
+    { id:'documents',      label:'Documents',       route:'documents',      icon:'folder' }
+  ]},
+  { id:'finance', label:'Finance', items:[
+    { id:'fees',          label:'Fees',              route:'fees',          icon:'wallet' },
+    { id:'payments',      label:'Payments',          route:'payments',      icon:'credit-card' },
+    { id:'fee-structures',label:'Fee Structures',    route:'fee-structures',icon:'list' },
+    { id:'fin-reports',   label:'Financial Reports', route:'fin-reports',   icon:'bar-chart' }
+  ]},
+  { id:'islamic', label:'Islamic Section', items:[
+    { id:'isl-students',   label:'Students',  route:'isl-students',   icon:'users' },
+    { id:'isl-teachers',   label:'Teachers',  route:'isl-teachers',   icon:'teacher' },
+    { id:'isl-subjects',   label:'Subjects',  route:'isl-subjects',   icon:'book' },
+    { id:'isl-attendance', label:'Attendance',route:'isl-attendance', icon:'check-square' },
+    { id:'isl-results',    label:'Results',   route:'isl-results',    icon:'bar-chart' }
+  ]},
+  { id:'reports', label:'Reports', items:[
+    { id:'rep-students',  label:'Student Reports',     route:'rep-students',  icon:'file-text' },
+    { id:'rep-academic',  label:'Academic Reports',    route:'rep-academic',  icon:'file-text' },
+    { id:'rep-attendance',label:'Attendance Reports',  route:'rep-attendance',icon:'check-square' },
+    { id:'rep-exam',      label:'Examination Reports', route:'rep-exam',      icon:'file-check' },
+    { id:'rep-cbt',       label:'CBT Reports',         route:'rep-cbt',       icon:'monitor' },
+    { id:'rep-staff',     label:'Staff Reports',       route:'rep-staff',     icon:'briefcase' }
+  ]},
+  { id:'system', label:'System', items:[
+    { id:'users-roles',  label:'Users & Roles',      route:'users-roles',  icon:'shield' },
+    { id:'permissions',  label:'Permissions',        route:'permissions',  icon:'lock' },
+    { id:'sys-settings', label:'System Settings',    route:'settings',     icon:'settings' },
+    { id:'audit-log',    label:'Audit Logs',         route:'audit-log',    icon:'activity' },
+    { id:'backup',       label:'Data Management',    route:'backup',       icon:'database' }
+  ]}
+];
+
+const ICONS = {
+  home:'<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/>',
+  bell:'<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',
+  activity:'<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>',
+  users:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+  teacher:'<path d="M22 10 12 5 2 10l10 5 10-5Z"/><path d="M6 12v5c3 2 9 2 12 0v-5"/>',
+  briefcase:'<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M2 13h20"/>',
+  shield:'<path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5l-8-3Z"/>',
+  monitor:'<rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 20h8"/><path d="M12 18v2"/>',
+  family:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/>',
+  building:'<path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 9h.01M9 13h.01M9 17h.01M15 9h.01M15 13h.01M15 17h.01"/>',
+  book:'<path d="M4 4h12a3 3 0 0 1 3 3v13H7a3 3 0 0 1-3-3V4Z"/><path d="M4 7h15"/><path d="M9 12h6"/>',
+  calendar:'<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
+  'calendar-check':'<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><polyline points="9 15 11 17 15 13"/>',
+  'calendar-grid':'<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="9" y1="4" x2="9" y2="22"/><line x1="15" y1="4" x2="15" y2="22"/>',
+  'file-text':'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/>',
+  'check-square':'<polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>',
+  'file-check':'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><polyline points="9 15 11 17 15 13"/>',
+  'bar-chart':'<line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/>',
+  clipboard:'<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/>',
+  database:'<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/>',
+  megaphone:'<path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>',
+  folder:'<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>',
+  wallet:'<path d="M21 12V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5"/><path d="M16 12h5"/>',
+  'credit-card':'<rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/>',
+  list:'<line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3.5" cy="6" r="1"/><circle cx="3.5" cy="12" r="1"/><circle cx="3.5" cy="18" r="1"/>',
+  lock:'<rect x="4" y="10.5" width="16" height="10" rx="2.4"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/>',
+  settings:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/>',
+  edit:'<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5Z"/>',
+  trash:'<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/>',
+  plus:'<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',
+  check:'<polyline points="20 6 9 17 4 12"/>',
+  zap:'<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>'
+};
+
+function svg(name){
+  const path = ICONS[name] || ICONS.home;
+  return `<svg viewBox="0 0 24 24" aria-hidden="true">${path}</svg>`;
+}
+
+/* ============================================================
+   THEME
+   ============================================================ */
+function setTheme(theme){
+  document.documentElement.setAttribute('data-theme', theme);
+  try{ localStorage.setItem('almafaaz.theme', theme); }catch(e){}
+  const next = theme === 'dark' ? 'light' : 'dark';
+  themeMenuLabel.textContent = `Switch to ${next}`;
+  themeBtn.setAttribute('aria-label', `Switch to ${next} theme`);
+}
+function currentTheme(){ return document.documentElement.getAttribute('data-theme') || 'dark'; }
+themeBtn.addEventListener('click', () => setTheme(currentTheme() === 'dark' ? 'light' : 'dark'));
+themeMenuItem.addEventListener('click', () => { setTheme(currentTheme() === 'dark' ? 'light' : 'dark'); closeProfileMenu(); });
+setTheme(currentTheme());
+
+/* ============================================================
+   DRAWER
+   ============================================================ */
+function openDrawer(){ sidebar.classList.add('open'); backdrop.classList.add('open'); document.body.style.overflow='hidden'; }
+function closeDrawer(){ sidebar.classList.remove('open'); backdrop.classList.remove('open'); document.body.style.overflow=''; }
+menuBtn.addEventListener('click', openDrawer);
+backdrop.addEventListener('click', closeDrawer);
+
+/* ============================================================
+   PROFILE MENU
+   ============================================================ */
+function openProfileMenu(){ profileMenu.classList.add('open'); profileMenu.setAttribute('aria-hidden','false'); profileTrigger.setAttribute('aria-expanded','true'); }
+function closeProfileMenu(){ profileMenu.classList.remove('open'); profileMenu.setAttribute('aria-hidden','true'); profileTrigger.setAttribute('aria-expanded','false'); }
+profileTrigger.addEventListener('click', (e) => { e.stopPropagation(); profileMenu.classList.contains('open') ? closeProfileMenu() : openProfileMenu(); });
+document.addEventListener('click', (e) => { if (!profileMenu.contains(e.target) && e.target !== profileTrigger) closeProfileMenu(); });
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape'){ closeProfileMenu(); closeDrawer(); if (modalEl.classList.contains('open')) closeModal(); }
+  if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA' && !modalEl.classList.contains('open')){
+    e.preventDefault(); searchInput && searchInput.focus();
+  }
+});
+profileMenu.querySelectorAll('[data-nav]').forEach(el => {
+  el.addEventListener('click', () => { navigate(el.dataset.nav); closeProfileMenu(); });
+});
+
+/* ============================================================
+   LOGOUT
+   ============================================================ */
+logoutBtn.addEventListener('click', async () => {
+  logoutBtn.disabled = true;
+  try{ await supabase.auth.signOut(); }catch(_){}
+  try{ localStorage.removeItem('almafaaz.auth'); }catch(_){}
+  window.location.replace('index.html');
+});
+
+/* ============================================================
+   TOASTS
+   ============================================================ */
+function toast(type, title, body){
+  const host = $('toast-host');
+  const el = document.createElement('div');
+  el.className = 'toast ' + type;
+  const iconName = type === 'success' ? 'check' : type === 'error' ? 'trash' : type === 'warning' ? 'bell' : 'check';
+  el.innerHTML = `${svg(iconName)}<div class="msg"><strong>${escapeHtml(title)}</strong>${body ? `<span>${escapeHtml(body)}</span>` : ''}</div>`;
+  host.appendChild(el);
+  requestAnimationFrame(() => el.classList.add('show'));
+  setTimeout(() => {
+    el.classList.remove('show');
+    setTimeout(() => el.remove(), 300);
+  }, 4200);
+}
+
+/* ============================================================
+   MODAL SYSTEM
+   ============================================================ */
+let modalOnClose = null;
+function openModal({ title, subtitle, body, footer, size }){
+  modalTitle.textContent = title || '';
+  modalSub.textContent = subtitle || '';
+  modalSub.style.display = subtitle ? '' : 'none';
+  modalBody.innerHTML = body || '';
+  modalFoot.innerHTML = footer || '';
+  modalEl.classList.toggle('modal-sm', size === 'sm');
+  modalEl.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => {
+    const focusable = modalEl.querySelector('input,select,textarea,button:not([data-close-modal])');
+    focusable?.focus();
+  }, 80);
+}
+function closeModal(){
+  modalEl.classList.remove('open');
+  document.body.style.overflow = '';
+  modalBody.innerHTML = '';
+  modalFoot.innerHTML = '';
+  if (typeof modalOnClose === 'function'){
+    const fn = modalOnClose;
+    modalOnClose = null;
+    setTimeout(fn, 60);
+  }
+}
+modalEl.querySelectorAll('[data-close-modal]').forEach(el => el.addEventListener('click', closeModal));
+
+/* Focus trap */
+modalEl.addEventListener('keydown', (e) => {
+  if (e.key !== 'Tab') return;
+  const focusables = modalEl.querySelectorAll('input,select,textarea,button,[tabindex]:not([tabindex="-1"])');
+  if (!focusables.length) return;
+  const first = focusables[0], last = focusables[focusables.length - 1];
+  if (e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+});
+
+/* Confirm dialog helper */
+function confirmDialog({ title, message, confirmLabel='Delete', danger=true, onConfirm }){
+  openModal({
+    title,
+    subtitle: '',
+    size: 'sm',
+    body: `<p style="margin:0;color:var(--text-2);font-size:14px;line-height:1.6;">${escapeHtml(message)}</p>`,
+    footer: `
+      <button type="button" class="btn btn-ghost" data-close-modal>Cancel</button>
+      <button type="button" class="btn ${danger ? 'btn-danger' : 'btn-primary'}" id="modal-confirm">${escapeHtml(confirmLabel)}</button>
+    `
+  });
+  $('modal-confirm').addEventListener('click', async () => {
+    const btn = $('modal-confirm');
+    btn.disabled = true;
+    btn.textContent = 'Working…';
+    try{
+      await onConfirm();
+      closeModal();
+    } catch(err){
+      btn.disabled = false;
+      btn.textContent = confirmLabel;
+      console.error('[confirm] error', err);
+    }
+  });
+}
+
+/* ============================================================
+   SIDEBAR RENDERING
+   ============================================================ */
+function renderSidebar(){
+  const nav = $('sidebar-nav');
+  nav.innerHTML = NAV.map(group => `
+    <div class="nav-group" data-open="${group.open ? 'true' : 'false'}">
+      <button type="button" class="nav-group-btn"
+              aria-expanded="${group.open ? 'true' : 'false'}"
+              data-group="${group.id}">
+        <span>${group.label}</span>
+        <svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 6 15 12 9 18"/></svg>
+      </button>
+      <div class="nav-items">
+        ${group.items.map(it => `
+          <a class="nav-item" data-route="${it.route}" href="#${it.route}">
+            <span class="ico">${svg(it.icon)}</span>
+            <span class="label">${it.label}</span>
+          </a>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+
+  nav.querySelectorAll('.nav-group-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const group = btn.closest('.nav-group');
+      const open = group.dataset.open === 'true';
+      group.dataset.open = open ? 'false' : 'true';
+      btn.setAttribute('aria-expanded', open ? 'false' : 'true');
+    });
+  });
+
+  nav.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', (e) => {
+      e.preventDefault();
+      navigate(item.dataset.route);
+      if (window.innerWidth <= 900) closeDrawer();
+    });
+  });
+
+  highlightActiveNav();
+}
+
+function highlightActiveNav(){
+  document.querySelectorAll('.nav-item').forEach(el => {
+    el.classList.toggle('active', el.dataset.route === state.route);
+  });
+}
+
+/* ============================================================
+   ROUTER
+   ============================================================ */
+function navigate(route){
+  state.route = route;
+  window.location.hash = route;
+  render();
+}
+window.addEventListener('hashchange', () => {
+  const r = window.location.hash.replace(/^#/, '') || 'dashboard';
+  state.route = r;
+  render();
+});
+function findNavMeta(route){
+  for (const group of NAV) for (const item of group.items) if (item.route === route) return { group: group.label, item };
+  return null;
+}
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+function render(){
+  const meta = findNavMeta(state.route);
+  if (!meta){ state.route = 'dashboard'; return render(); }
+  crumb.textContent = meta.group;
+  pageTitle.textContent = meta.item.label;
+
+  switch (state.route){
+    case 'dashboard':       renderDashboard(); break;
+    case 'sessions':        renderSessions(); break;
+    case 'notifications':   renderPlaceholder('Notifications', 'Your alerts and system messages will appear here.'); break;
+    case 'audit-log':       renderPlaceholder('Activity Log', 'A record of every administrative action performed in the system.'); break;
+    case 'students':        renderPlaceholder('Students', 'Register, search, filter and manage student records.'); break;
+    case 'teachers':        renderPlaceholder('Teachers', 'Manage teaching staff, subjects and assignments.'); break;
+    case 'staff':           renderPlaceholder('Staff', 'Non-teaching staff directory and records.'); break;
+    case 'administrators':  renderPlaceholder('Administrators', 'Create, edit and manage administrative accounts.'); break;
+    case 'cbt-admins':      renderPlaceholder('CBT Administrators', 'Manage accounts with CBT-specific privileges.'); break;
+    case 'parents':         renderPlaceholder('Parents', 'Parent and guardian records linked to students.'); break;
+    case 'classes':         renderPlaceholder('Classes & Arms', 'Configure classes, arms and class-level settings.'); break;
+    case 'subjects':        renderPlaceholder('Subjects', 'The full subject catalogue across all levels.'); break;
+    case 'terms':           renderPlaceholder('Terms', 'Use the Academic Sessions page to manage terms.'); break;
+    case 'timetable':       renderPlaceholder('Timetable', 'Build class and teacher timetables with conflict detection.'); break;
+    case 'scheme':          renderPlaceholder('Scheme of Work', 'Create and publish schemes of work by class and subject.'); break;
+    case 'attendance':      renderPlaceholder('Attendance', 'Track student, teacher and staff attendance.'); break;
+    case 'examinations':    renderPlaceholder('Examinations', 'Create and configure examinations.'); break;
+    case 'results':         renderPlaceholder('Results', 'Enter, review and publish examination results.'); break;
+    case 'assignments':     renderPlaceholder('Assignments', 'Assignments and submissions across classes.'); break;
+    case 'cbt':             renderPlaceholder('CBT Dashboard', 'Overview of computer-based testing activity.'); break;
+    case 'cbt-questions':   renderPlaceholder('Question Bank', 'Manage CBT questions by subject, class and topic.'); break;
+    case 'cbt-exams':       renderPlaceholder('CBT Examinations', 'Create and monitor CBT exams.'); break;
+    case 'cbt-candidates':  renderPlaceholder('CBT Candidates', 'Assign candidates to CBT examinations.'); break;
+    case 'cbt-results':     renderPlaceholder('CBT Results', 'Scores, rankings and question analysis.'); break;
+    case 'school-profile':  renderPlaceholder('School Profile', 'Identity, contact and location of the academy.'); break;
+    case 'announcements':   renderPlaceholder('Announcements', 'Send announcements to staff, students or parents.'); break;
+    case 'events':          renderPlaceholder('Events', 'School calendar events and schedules.'); break;
+    case 'documents':       renderPlaceholder('Documents', 'Store and share institutional documents.'); break;
+    case 'fees':            renderPlaceholder('Fees', 'Student fee records and balances.'); break;
+    case 'payments':        renderPlaceholder('Payments', 'Record and review student payments.'); break;
+    case 'fee-structures':  renderPlaceholder('Fee Structures', 'Define fee structures by class and term.'); break;
+    case 'fin-reports':     renderPlaceholder('Financial Reports', 'Income, outstanding balances and payment summaries.'); break;
+    case 'isl-students':    renderPlaceholder('Islamic Students', 'Students enrolled in the Islamic section.'); break;
+    case 'isl-teachers':    renderPlaceholder('Islamic Teachers', 'Teachers of the Islamic section.'); break;
+    case 'isl-subjects':    renderPlaceholder('Islamic Subjects', 'Islamic studies subjects and levels.'); break;
+    case 'isl-attendance':  renderPlaceholder('Islamic Attendance', 'Attendance for Islamic classes.'); break;
+    case 'isl-results':     renderPlaceholder('Islamic Results', 'Assessments and results for Islamic subjects.'); break;
+    case 'rep-students':    renderPlaceholder('Student Reports', 'Enrolment and demographic reports.'); break;
+    case 'rep-academic':    renderPlaceholder('Academic Reports', 'Performance trends by class and subject.'); break;
+    case 'rep-attendance':  renderPlaceholder('Attendance Reports', 'Attendance rates and absence patterns.'); break;
+    case 'rep-exam':        renderPlaceholder('Examination Reports', 'Examination results and analytics.'); break;
+    case 'rep-cbt':         renderPlaceholder('CBT Reports', 'CBT performance and question analytics.'); break;
+    case 'rep-staff':       renderPlaceholder('Staff Reports', 'Staff composition and activity.'); break;
+    case 'users-roles':     renderPlaceholder('Users & Roles', 'Assign and review account roles.'); break;
+    case 'permissions':     renderPlaceholder('Permissions', 'Fine-grained access controls.'); break;
+    case 'settings':        renderPlaceholder('System Settings', 'Academy-wide system configuration.'); break;
+    case 'backup':          renderPlaceholder('Data Management', 'Backup and data export utilities.'); break;
+    case 'profile':         renderPlaceholder('My Profile', 'Your account details and preferences.'); break;
+    default:                renderPlaceholder('Coming soon', 'This module is scheduled for a future phase.'); break;
+  }
+  highlightActiveNav();
+}
+
+function renderPlaceholder(title, description){
+  workspace.innerHTML = `
+    <div class="page-head">
+      <div class="left">
+        <span class="eyebrow"><span class="live"></span> Module scheduled</span>
+        <h2>${escapeHtml(title)}</h2>
+        <p class="sub">${escapeHtml(description)}</p>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-body flush">
+        <div class="empty">
+          <div class="ico-wrap">${svg('database')}</div>
+          <h4>${escapeHtml(title)} is not yet active</h4>
+          <p>This module is part of the ALMAFAAZ roadmap. It will be delivered in a subsequent phase of the platform build.</p>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/* ============================================================
+   DASHBOARD HOME
+   ============================================================ */
+async function renderDashboard(){
+  workspace.innerHTML = `
+    <div class="page-head">
+      <div class="left">
+        <span class="eyebrow"><span class="live"></span> Academy overview</span>
+        <h2 id="welcome-line">Welcome back</h2>
+        <p class="sub">Here's the current state of the academy. All figures reflect live data.</p>
+      </div>
+      <div class="right">
+        <button class="btn btn-ghost" type="button" data-action="refresh">
+          ${svg('activity')} Refresh
+        </button>
+      </div>
+    </div>
+
+    <div class="metrics">
+      ${metricCard('students', 'Students', 'users', '')}
+      ${metricCard('teachers', 'Teachers', 'teacher', 'green')}
+      ${metricCard('staff', 'Staff', 'briefcase', 'info')}
+      ${metricCard('classes', 'Classes', 'building', 'warning')}
+      ${metricCard('cbt', 'CBT Exams', 'monitor', '')}
+    </div>
+
+    <div class="content-grid">
+      <div>
+        <div class="panel">
+          <div class="panel-head">
+            <div class="titles">
+              <h3>Recent activity</h3>
+              <p>Latest administrative actions logged by the system</p>
+            </div>
+            <div class="actions">
+              <button class="btn btn-ghost btn-sm" type="button" data-nav="audit-log">View all</button>
+            </div>
+          </div>
+          <div class="panel-body flush" id="activity-panel">
+            <div class="empty">
+              <div class="ico-wrap">${svg('activity')}</div>
+              <h4>No activity recorded yet</h4>
+              <p>When you create students, teachers, or make administrative changes, they'll appear here.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-title"><h3><span class="accent"></span>Quick actions</h3></div>
+        <div class="qa-grid">
+          <button class="qa" type="button" data-nav="sessions">
+            <span class="ico">${svg('calendar')}</span>
+            <span class="label">Academic sessions</span>
+          </button>
+          <button class="qa" type="button" data-nav="students">
+            <span class="ico">${svg('users')}</span>
+            <span class="label">Add a student</span>
+          </button>
+          <button class="qa" type="button" data-nav="teachers">
+            <span class="ico">${svg('teacher')}</span>
+            <span class="label">Add a teacher</span>
+          </button>
+          <button class="qa" type="button" data-nav="classes">
+            <span class="ico">${svg('building')}</span>
+            <span class="label">Manage classes</span>
+          </button>
+          <button class="qa" type="button" data-nav="cbt-exams">
+            <span class="ico">${svg('monitor')}</span>
+            <span class="label">Create CBT exam</span>
+          </button>
+          <button class="qa" type="button" data-nav="settings">
+            <span class="ico">${svg('settings')}</span>
+            <span class="label">System settings</span>
+          </button>
+        </div>
+      </div>
+
+      <div>
+        <div class="panel">
+          <div class="panel-head">
+            <div class="titles">
+              <h3>System status</h3>
+              <p>Live state of the platform</p>
+            </div>
+          </div>
+          <div class="panel-body flush">
+            <div class="status-list">
+              <div class="status-row"><span class="dot green"></span><span class="text">Database</span><span class="state ok">Connected</span></div>
+              <div class="status-row"><span class="dot green"></span><span class="text">Authentication</span><span class="state ok">Active</span></div>
+              <div class="status-row"><span class="dot orange"></span><span class="text">Academic session</span><span class="state warn" id="status-session">Not set</span></div>
+              <div class="status-row"><span class="dot orange"></span><span class="text">Active term</span><span class="state warn" id="status-term">Not set</span></div>
+              <div class="status-row"><span class="dot gray"></span><span class="text">Notifications</span><span class="state" id="status-notifs">—</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-title"><h3><span class="accent"></span>Academic context</h3></div>
+        <div class="panel">
+          <div class="panel-body">
+            <div style="display:flex;flex-direction:column;gap:14px;">
+              <div>
+                <div style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-3);font-weight:800;margin-bottom:6px;">Session</div>
+                <div style="font-size:15px;font-weight:700;color:var(--text);" id="ctx-session">—</div>
+              </div>
+              <div>
+                <div style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-3);font-weight:800;margin-bottom:6px;">Term</div>
+                <div style="font-size:15px;font-weight:700;color:var(--text);" id="ctx-term">—</div>
+              </div>
+              <button class="btn btn-ghost" type="button" data-nav="sessions" style="width:100%;justify-content:center;">
+                ${svg('calendar')} Manage sessions
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  workspace.querySelectorAll('[data-nav]').forEach(el => el.addEventListener('click', () => navigate(el.dataset.nav)));
+  workspace.querySelectorAll('[data-action="refresh"]').forEach(el => el.addEventListener('click', () => loadDashboardData()));
+
+  const w = $('welcome-line');
+  if (w && state.profile){
+    const name = state.profile.full_name || state.profile.email || 'Administrator';
+    const hour = new Date().getHours();
+    const greet = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+    w.textContent = `${greet}, ${name.split(' ')[0]}`;
+  }
+
+  loadDashboardData();
+}
+
+function metricCard(id, label, icon, variant){
+  return `
+    <div class="metric ${variant || ''}" data-metric="${id}">
+      <div class="head">
+        <span class="label">${label}</span>
+        <span class="ico-wrap">${svg(icon)}</span>
+      </div>
+      <div class="value loading" data-value="${id}">—</div>
+      <div class="foot" data-foot="${id}">Loading…</div>
+    </div>
+  `;
+}
+
+async function loadDashboardData(){
+  await Promise.all([
+    loadCount('students', 'students', 'students registered'),
+    loadCount('teachers', 'teachers', 'teachers on record'),
+    loadCount('staff', 'staff', 'staff members'),
+    loadCount('classes', 'classes', 'active classes'),
+    loadCount('cbt', 'cbt_examinations', 'CBT examinations'),
+    loadAcademicContext(),
+    loadRecentActivity()
+  ]);
+}
+
+async function loadCount(metricId, table, noun){
+  const valueEl = document.querySelector(`[data-value="${metricId}"]`);
+  const footEl  = document.querySelector(`[data-foot="${metricId}"]`);
+  if (!valueEl) return;
+  try{
+    const { count, error } = await supabase.from(table).select('*', { count:'exact', head:true });
+    if (error) throw error;
+    valueEl.classList.remove('loading');
+    valueEl.textContent = count ?? 0;
+    if (count === 0){ valueEl.classList.add('muted'); if (footEl) footEl.textContent = `No ${noun} yet`; }
+    else { if (footEl) footEl.textContent = noun; }
+  } catch(err){
+    console.error(`[dashboard] count(${table}) failed`, err);
+    valueEl.classList.remove('loading');
+    valueEl.textContent = '—';
+    if (footEl) footEl.textContent = 'Unable to load';
+  }
+}
+
+async function loadAcademicContext(){
+  try{
+    const [{ data: session }, { data: term }] = await Promise.all([
+      supabase.from('academic_sessions').select('name').eq('is_active', true).maybeSingle(),
+      supabase.from('terms').select('name').eq('is_active', true).maybeSingle()
+    ]);
+    const sName = session?.name || null;
+    const tName = term?.name  || null;
+    state.sessionName = sName;
+    state.termName    = tName;
+    const set = (id, val, fallback) => { const el = $(id); if (el) el.textContent = val || fallback; };
+    set('session-name', sName ? `${sName} session` : 'No active session', 'No active session');
+    set('session-term', tName ? tName : 'Set up academics', 'Set up academics');
+    set('ctx-session',  sName, '—');
+    set('ctx-term',     tName, '—');
+    const sSess = $('status-session');
+    const sTerm = $('status-term');
+    if (sSess){ sSess.textContent = sName || 'Not set'; sSess.className = 'state ' + (sName ? 'ok' : 'warn'); }
+    if (sTerm){ sTerm.textContent = tName || 'Not set'; sTerm.className = 'state ' + (tName ? 'ok' : 'warn'); }
+  } catch(err){ console.error('[dashboard] academic context failed', err); }
+}
+
+async function loadRecentActivity(){
+  const panel = $('activity-panel');
+  if (!panel) return;
+  try{
+    const { data, error } = await supabase
+      .from('audit_logs')
+      .select('id, actor_email, action, target_type, target_email, created_at')
+      .order('created_at', { ascending:false })
+      .limit(10);
+    if (error) throw error;
+    if (!data || data.length === 0){
+      panel.innerHTML = `
+        <div class="empty">
+          <div class="ico-wrap">${svg('activity')}</div>
+          <h4>No activity recorded yet</h4>
+          <p>When you create students, teachers, or make administrative changes, they'll appear here.</p>
+        </div>`;
+      return;
+    }
+    panel.innerHTML = `
+      <div class="activity-list">
+        ${data.map(row => `
+          <div class="activity-row">
+            <div class="dot-col"><span class="dot"></span></div>
+            <div class="text">
+              <div class="line">
+                <span class="actor">${escapeHtml(row.actor_email || 'System')}</span>
+                ${humanAction(row.action)}
+                ${row.target_email ? `<span class="target">${escapeHtml(row.target_email)}</span>` : ''}
+              </div>
+              <div class="meta">
+                <span>${timeAgo(row.created_at)}</span>
+                ${row.target_type ? `<span class="sep"></span><span>${escapeHtml(row.target_type)}</span>` : ''}
+              </div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  } catch(err){
+    console.error('[dashboard] activity failed', err);
+    panel.innerHTML = `
+      <div class="empty">
+        <div class="ico-wrap">${svg('activity')}</div>
+        <h4>Unable to load activity</h4>
+        <p>There was a problem reaching the activity log. Please try again shortly.</p>
+      </div>`;
+  }
+}
+
+/* ============================================================
+   ACADEMIC SESSIONS MODULE
+   ============================================================ */
+async function renderSessions(){
+  workspace.innerHTML = `
+    <div class="page-head">
+      <div class="left">
+        <span class="eyebrow"><span class="live"></span> Academic Foundation</span>
+        <h2>Academic Sessions & Terms</h2>
+        <p class="sub">Sessions define the school year. Terms sit inside sessions. Only one session and one term can be active at a time.</p>
+      </div>
+      <div class="right">
+        <button class="btn btn-ghost" type="button" id="sessions-refresh">
+          ${svg('activity')} Refresh
+        </button>
+        <button class="btn btn-primary" type="button" id="sessions-new">
+          ${svg('plus')} New Session
+        </button>
+      </div>
+    </div>
+
+    <div class="refresh-bar" id="sessions-refresh-bar"><div class="fill"></div></div>
+
+    <div id="sessions-host"></div>
+  `;
+
+  $('sessions-refresh').addEventListener('click', loadSessions);
+  $('sessions-new').addEventListener('click', () => openSessionForm());
+
+  await loadSessions();
+}
+
+async function loadSessions(){
+  const host = $('sessions-host');
+  if (!host) return;
+  const bar = $('sessions-refresh-bar');
+  bar?.classList.add('show');
+
+  try{
+    const { data: sessions, error } = await supabase
+      .from('academic_sessions')
+      .select('id, name, start_date, end_date, is_active, created_at')
+      .order('is_active', { ascending: false })
+      .order('created_at', { ascending:false });
+
+    if (error) throw error;
+
+    state.sessions = sessions || [];
+
+    /* Fetch term counts for each session */
+    if (state.sessions.length){
+      const ids = state.sessions.map(s => s.id);
+      const { data: terms, error: tErr } = await supabase
+        .from('terms')
+        .select('id, name, academic_session_id, start_date, end_date, is_active')
+        .in('academic_session_id', ids)
+        .order('created_at', { ascending:true });
+
+      if (tErr) throw tErr;
+
+      state.termsBySession = {};
+      (terms || []).forEach(t => {
+        if (!state.termsBySession[t.academic_session_id]) state.termsBySession[t.academic_session_id] = [];
+        state.termsBySession[t.academic_session_id].push(t);
+      });
+    } else {
+      state.termsBySession = {};
+    }
+
+    renderSessionsList();
+  } catch(err){
+    console.error('[sessions] load failed', err);
+    host.innerHTML = `
+      <div class="panel">
+        <div class="panel-body flush">
+          <div class="empty">
+            <div class="ico-wrap">${svg('database')}</div>
+            <h4>Unable to load sessions</h4>
+            <p>There was a problem reaching the server. Please refresh or try again in a moment.</p>
+          </div>
+        </div>
+      </div>`;
+  } finally {
+    bar?.classList.remove('show');
+  }
+}
+
+function renderSessionsList(){
+  const host = $('sessions-host');
+  if (!host) return;
+
+  if (!state.sessions.length){
+    host.innerHTML = `
+      <div class="panel">
+        <div class="panel-body flush">
+          <div class="empty">
+            <div class="ico-wrap">${svg('calendar')}</div>
+            <h4>No academic sessions yet</h4>
+            <p>Create your first academic session — for example <strong>2026/2027</strong> — to start structuring the school year.</p>
+            <button class="btn btn-primary" type="button" onclick="document.getElementById('sessions-new')?.click()">
+              ${svg('plus')} Create first session
+            </button>
+          </div>
+        </div>
+      </div>`;
+    return;
+  }
+
+  host.innerHTML = `
+    <div class="sessions-list">
+      ${state.sessions.map(session => sessionCard(session)).join('')}
+    </div>
+  `;
+
+  /* Wire action buttons */
+  host.querySelectorAll('[data-action]').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const action = btn.dataset.action;
+      const id = btn.dataset.id;
+      if (action === 'toggle-terms') toggleSessionTerms(id);
+      else if (action === 'activate-session') await activateSession(id);
+      else if (action === 'edit-session') openSessionForm(state.sessions.find(s => s.id === id));
+      else if (action === 'delete-session') await deleteSession(id);
+      else if (action === 'add-term') openTermForm(id);
+      else if (action === 'edit-term') openTermForm(btn.dataset.sessionId, state.termsBySession[btn.dataset.sessionId]?.find(t => t.id === id));
+      else if (action === 'activate-term') await activateTerm(id, btn.dataset.sessionId);
+      else if (action === 'delete-term') await deleteTerm(id, btn.dataset.sessionId);
+    });
+  });
+}
+
+function sessionCard(session){
+  const terms = state.termsBySession[session.id] || [];
+  const expanded = state.expandedSessions.has(session.id);
+  const dateRange = formatDateRange(session.start_date, session.end_date);
+
+  return `
+    <div class="session-card ${session.is_active ? 'is-active' : ''}" data-session="${session.id}">
+      <div class="session-head">
+        <div class="left">
+          <h3 class="name">
+            ${escapeHtml(session.name)}
+            ${session.is_active ? `<span class="badge active"><span class="bdot"></span> Active</span>` : `<span class="badge inactive">Inactive</span>`}
+          </h3>
+          <div class="dates">
+            <span>${escapeHtml(dateRange)}</span>
+            <span class="sep">·</span>
+            <span>${terms.length} term${terms.length === 1 ? '' : 's'}</span>
+          </div>
+        </div>
+        <div class="right">
+          ${!session.is_active ? `
+            <button type="button" class="btn btn-ghost btn-sm" data-action="activate-session" data-id="${session.id}">
+              ${svg('zap')} Set Active
+            </button>` : ''}
+          <button type="button" class="btn btn-ghost btn-sm" data-action="edit-session" data-id="${session.id}">
+            ${svg('edit')} Edit
+          </button>
+          <button type="button" class="btn btn-ghost btn-sm" data-action="delete-session" data-id="${session.id}">
+            ${svg('trash')} Delete
+          </button>
+          <button type="button" class="btn btn-ghost btn-sm" data-action="toggle-terms" data-id="${session.id}">
+            ${expanded ? 'Hide terms' : 'Show terms'}
+          </button>
+        </div>
+      </div>
+
+      ${expanded ? `
+        <div class="session-terms">
+          <div class="session-terms-head">
+            <span class="label">Terms</span>
+            <button type="button" class="btn btn-ghost btn-sm" data-action="add-term" data-id="${session.id}">
+              ${svg('plus')} Add term
+            </button>
+          </div>
+          ${terms.length ? `
+            <div class="terms-grid">
+              ${terms.map(t => termRow(t, session.id)).join('')}
+            </div>
+          ` : `
+            <div style="text-align:center;padding:18px 12px;color:var(--text-3);font-size:13px;">
+              No terms yet in this session.
+            </div>
+          `}
+        </div>
+      ` : ''}
+    </div>
+  `;
+}
+
+function termRow(term, sessionId){
+  const dateRange = formatDateRange(term.start_date, term.end_date);
+  return `
+    <div class="term-row ${term.is_active ? 'is-active' : ''}">
+      <div class="left">
+        <h4 class="name">
+          ${escapeHtml(term.name)}
+          ${term.is_active ? `<span class="badge active"><span class="bdot"></span> Active</span>` : ''}
+        </h4>
+        <div class="dates">${escapeHtml(dateRange)}</div>
+      </div>
+      <div class="right">
+        ${!term.is_active ? `
+          <button type="button" class="btn btn-ghost btn-sm" data-action="activate-term" data-id="${term.id}" data-session-id="${sessionId}">
+            ${svg('zap')} Activate
+          </button>` : ''}
+        <button type="button" class="btn btn-ghost btn-sm" data-action="edit-term" data-id="${term.id}" data-session-id="${sessionId}">
+          ${svg('edit')}
+        </button>
+        <button type="button" class="btn btn-ghost btn-sm" data-action="delete-term" data-id="${term.id}" data-session-id="${sessionId}">
+          ${svg('trash')}
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+function toggleSessionTerms(id){
+  if (state.expandedSessions.has(id)) state.expandedSessions.delete(id);
+  else state.expandedSessions.add(id);
+  renderSessionsList();
+}
+
+/* --- Session CRUD --- */
+function openSessionForm(session){
+  const isEdit = !!session;
+  openModal({
+    title: isEdit ? 'Edit session' : 'New academic session',
+    subtitle: isEdit ? 'Update session details.' : 'Create a new academic session for the school year.',
+    body: `
+      <div class="form-row">
+        <label class="form-label" for="sess-name">Session name <span class="req">*</span></label>
+        <input class="form-input" id="sess-name" type="text" placeholder="2026/2027" value="${session ? escapeHtml(session.name) : ''}" autocomplete="off" />
+        <div class="form-error" id="err-sess-name">Please enter a session name.</div>
+        <div class="form-help">Typical format: 2026/2027</div>
+      </div>
+      <div class="form-grid">
+        <div class="form-row">
+          <label class="form-label" for="sess-start">Start date</label>
+          <input class="form-input" id="sess-start" type="date" value="${session?.start_date || ''}" />
+        </div>
+        <div class="form-row">
+          <label class="form-label" for="sess-end">End date</label>
+          <input class="form-input" id="sess-end" type="date" value="${session?.end_date || ''}" />
+        </div>
+      </div>
+      <div class="form-row">
+        <label class="toggle-row" for="sess-active">
+          <input type="checkbox" id="sess-active" ${session?.is_active ? 'checked' : (!state.sessions.some(s => s.is_active) ? 'checked' : '')} />
+          <span class="txt">
+            <strong>Set as the active session</strong>
+            <span>Activating this session will deactivate any other active session.</span>
+          </span>
+        </label>
+      </div>
+    `,
+    footer: `
+      <button type="button" class="btn btn-ghost" data-close-modal>Cancel</button>
+      <button type="button" class="btn btn-primary" id="sess-save">
+        ${isEdit ? 'Save changes' : 'Create session'}
+      </button>
+    `
+  });
+
+  $('sess-save').addEventListener('click', () => saveSession(session));
+}
+
+async function saveSession(existing){
+  const name = $('sess-name').value.trim();
+  const start = $('sess-start').value || null;
+  const end = $('sess-end').value || null;
+  const active = $('sess-active').checked;
+
+  if (!name){
+    $('err-sess-name').classList.add('show');
+    $('sess-name').classList.add('invalid');
+    $('sess-name').focus();
+    return;
+  }
+
+  const btn = $('sess-save');
+  btn.disabled = true;
+  const originalLabel = btn.textContent;
+  btn.textContent = 'Saving…';
+
+  try{
+    /* If activating, deactivate the current active session first (RLS-safe) */
+    if (active){
+      await supabase
+        .from('academic_sessions')
+        .update({ is_active: false })
+        .eq('is_active', true)
+        .neq('id', existing?.id || '00000000-0000-0000-0000-000000000000');
+    }
+
+    if (existing){
+      const { error } = await supabase
+        .from('academic_sessions')
+        .update({ name, start_date: start, end_date: end, is_active: active })
+        .eq('id', existing.id);
+      if (error) throw error;
+      toast('success', 'Session updated', `${name} has been saved.`);
+    } else {
+      const { error } = await supabase
+        .from('academic_sessions')
+        .insert({ name, start_date: start, end_date: end, is_active: active });
+      if (error) throw error;
+      toast('success', 'Session created', `${name} has been added.`);
+    }
+
+    closeModal();
+    await loadSessions();
+    /* Refresh sidebar chip + dashboard context */
+    loadAcademicContext();
+  } catch(err){
+    console.error('[sessions] save failed', err);
+    const msg = (err?.message || '').toLowerCase();
+    if (msg.includes('duplicate') || msg.includes('unique')){
+      toast('error', 'Duplicate session', 'A session with this name already exists.');
+    } else {
+      toast('error', 'Could not save', 'Please try again in a moment.');
+    }
+    btn.disabled = false;
+    btn.textContent = originalLabel;
+  }
+}
+
+async function activateSession(id){
+  const session = state.sessions.find(s => s.id === id);
+  if (!session) return;
+  try{
+    await supabase.from('academic_sessions').update({ is_active: false }).eq('is_active', true);
+    const { error } = await supabase.from('academic_sessions').update({ is_active: true }).eq('id', id);
+    if (error) throw error;
+    toast('success', 'Session activated', `${session.name} is now the active session.`);
+    await loadSessions();
+    loadAcademicContext();
+  } catch(err){
+    console.error('[sessions] activate failed', err);
+    toast('error', 'Could not activate', 'Please try again.');
+  }
+}
+
+async function deleteSession(id){
+  const session = state.sessions.find(s => s.id === id);
+  if (!session) return;
+
+  if (session.is_active){
+    toast('warning', 'Cannot delete active session', 'Deactivate it first, or activate a different session.');
+    return;
+  }
+
+  const termCount = (state.termsBySession[id] || []).length;
+  confirmDialog({
+    title: `Delete "${session.name}"?`,
+    message: termCount > 0
+      ? `This session contains ${termCount} term${termCount === 1 ? '' : 's'}. Deleting it will remove all its terms. This cannot be undone.`
+      : `This will permanently remove the session. This cannot be undone.`,
+    confirmLabel: 'Delete session',
+    onConfirm: async () => {
+      const { error } = await supabase.from('academic_sessions').delete().eq('id', id);
+      if (error) throw error;
+      state.expandedSessions.delete(id);
+      toast('success', 'Session deleted', `${session.name} has been removed.`);
+      await loadSessions();
+    }
+  });
+}
+
+/* --- Term CRUD --- */
+function openTermForm(sessionId, term){
+  const session = state.sessions.find(s => s.id === sessionId);
+  const isEdit = !!term;
+  openModal({
+    title: isEdit ? 'Edit term' : 'Add a term',
+    subtitle: session ? `In ${session.name}` : '',
+    body: `
+      <div class="form-row">
+        <label class="form-label" for="term-name">Term name <span class="req">*</span></label>
+        <input class="form-input" id="term-name" type="text" placeholder="First Term" value="${term ? escapeHtml(term.name) : ''}" autocomplete="off" />
+        <div class="form-error" id="err-term-name">Please enter a term name.</div>
+      </div>
+      <div class="form-grid">
+        <div class="form-row">
+          <label class="form-label" for="term-start">Start date</label>
+          <input class="form-input" id="term-start" type="date" value="${term?.start_date || ''}" />
+        </div>
+        <div class="form-row">
+          <label class="form-label" for="term-end">End date</label>
+          <input class="form-input" id="term-end" type="date" value="${term?.end_date || ''}" />
+        </div>
+      </div>
+      <div class="form-row">
+        <label class="toggle-row" for="term-active">
+          <input type="checkbox" id="term-active" ${term?.is_active ? 'checked' : ''} />
+          <span class="txt">
+            <strong>Set as the active term</strong>
+            <span>Only one term can be active globally. Activating this one will deactivate any other.</span>
+          </span>
+        </label>
+      </div>
+    `,
+    footer: `
+      <button type="button" class="btn btn-ghost" data-close-modal>Cancel</button>
+      <button type="button" class="btn btn-primary" id="term-save">${isEdit ? 'Save changes' : 'Add term'}</button>
+    `
+  });
+
+  $('term-save').addEventListener('click', () => saveTerm(sessionId, term));
+}
+
+async function saveTerm(sessionId, existing){
+  const name = $('term-name').value.trim();
+  const start = $('term-start').value || null;
+  const end = $('term-end').value || null;
+  const active = $('term-active').checked;
+
+  if (!name){
+    $('err-term-name').classList.add('show');
+    $('term-name').classList.add('invalid');
+    $('term-name').focus();
+    return;
+  }
+
+  const btn = $('term-save');
+  btn.disabled = true;
+  const original = btn.textContent;
+  btn.textContent = 'Saving…';
+
+  try{
+    if (active){
+      await supabase.from('terms').update({ is_active: false }).eq('is_active', true)
+        .neq('id', existing?.id || '00000000-0000-0000-0000-000000000000');
+    }
+
+    if (existing){
+      const { error } = await supabase.from('terms')
+        .update({ name, start_date: start, end_date: end, is_active: active })
+        .eq('id', existing.id);
+      if (error) throw error;
+      toast('success', 'Term updated', `${name} has been saved.`);
+    } else {
+      const { error } = await supabase.from('terms')
+        .insert({ academic_session_id: sessionId, name, start_date: start, end_date: end, is_active: active });
+      if (error) throw error;
+      toast('success', 'Term added', `${name} has been added.`);
+    }
+
+    closeModal();
+    state.expandedSessions.add(sessionId);
+    await loadSessions();
+    loadAcademicContext();
+  } catch(err){
+    console.error('[terms] save failed', err);
+    toast('error', 'Could not save', 'Please try again in a moment.');
+    btn.disabled = false;
+    btn.textContent = original;
+  }
+}
+
+async function activateTerm(id, sessionId){
+  try{
+    await supabase.from('terms').update({ is_active: false }).eq('is_active', true);
+    const { error } = await supabase.from('terms').update({ is_active: true }).eq('id', id);
+    if (error) throw error;
+    toast('success', 'Term activated', 'The selected term is now active.');
+    await loadSessions();
+    loadAcademicContext();
+  } catch(err){
+    console.error('[terms] activate failed', err);
+    toast('error', 'Could not activate term', 'Please try again.');
+  }
+}
+
+async function deleteTerm(id, sessionId){
+  const term = (state.termsBySession[sessionId] || []).find(t => t.id === id);
+  if (!term) return;
+  if (term.is_active){
+    toast('warning', 'Cannot delete active term', 'Deactivate it first, or activate a different term.');
+    return;
+  }
+  confirmDialog({
+    title: `Delete "${term.name}"?`,
+    message: `This will permanently remove this term. This cannot be undone.`,
+    confirmLabel: 'Delete term',
+    onConfirm: async () => {
+      const { error } = await supabase.from('terms').delete().eq('id', id);
+      if (error) throw error;
+      toast('success', 'Term deleted', `${term.name} has been removed.`);
+      await loadSessions();
+    }
+  });
+}
+
+/* ============================================================
+   UTILITIES
+   ============================================================ */
+function escapeHtml(s){
+  if (s === null || s === undefined) return '';
+  return String(s)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
+}
+
+function humanAction(action){
+  if (!action) return 'performed an action';
+  const map = {
+    'user.created': 'created an account for',
+    'user.role_changed': 'changed the role of',
+    'user.activated': 'activated the account of',
+    'user.deactivated': 'deactivated the account of',
+    'user.password_reset': 'reset the password for',
+    'user.deleted': 'deleted the account of'
+  };
+  return map[action] || action.replace(/[._]/g,' ');
+}
+
+function timeAgo(iso){
+  try{
+    const then = new Date(iso).getTime();
+    const now  = Date.now();
+    const sec  = Math.floor((now - then) / 1000);
+    if (sec < 45) return 'just now';
+    const min = Math.floor(sec / 60);
+    if (min < 60) return `${min} min ago`;
+    const hr = Math.floor(min / 60);
+    if (hr < 24) return `${hr} hr${hr === 1 ? '' : 's'} ago`;
+    const d = Math.floor(hr / 24);
+    if (d < 30) return `${d} day${d === 1 ? '' : 's'} ago`;
+    return new Date(iso).toLocaleDateString();
+  } catch(_){ return '—'; }
+}
+
+function formatDateRange(start, end){
+  if (!start && !end) return 'No dates set';
+  const fmt = (d) => {
+    if (!d) return '—';
+    try{
+      const dt = new Date(d + 'T00:00:00');
+      return dt.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+    } catch(_){ return d; }
+  };
+  return `${fmt(start)} — ${fmt(end)}`;
+}
+
+/* ============================================================
+   AUTH GUARD
+   ============================================================ */
+async function boot(){
+  try{
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.user) return redirectToLogin('no-session');
+
+    const { data: rows, error: rpcErr } = await supabase.rpc('get_my_profile');
+    if (rpcErr){ console.error('[dashboard] get_my_profile failed', rpcErr); return redirectToLogin('profile-error'); }
+
+    const profile = Array.isArray(rows) ? rows[0] : rows;
+    if (!profile) return redirectToLogin('no-profile');
+    if (!profile.is_active) return redirectToLogin('inactive');
+    if (profile.role !== 'super_admin') return redirectToLogin('not-super-admin');
+
+    state.user = session.user;
+    state.profile = profile;
+
+    populateIdentity(profile);
+    renderSidebar();
+    render();
+
+    authGate.classList.add('done');
+    app.style.display = 'grid';
+
+    const hash = window.location.hash.replace(/^#/, '');
+    if (hash && hash !== state.route) navigate(hash);
+  } catch(err){
+    console.error('[dashboard] boot failed', err);
+    redirectToLogin('boot-failed');
+  }
+}
+
+function populateIdentity(profile){
+  const name  = profile.full_name || profile.email || 'Super Admin';
+  const email = profile.email || '—';
+  const role  = profile.role === 'super_admin' ? 'Super Administrator' : profile.role;
+  const initials = (name.match(/\b\w/g) || ['S','A']).slice(0, 2).join('').toUpperCase();
+  $('avatar-initials').textContent = initials;
+  $('profile-name').textContent = name;
+  $('profile-role').textContent = role;
+  $('menu-name').textContent = name;
+  $('menu-email').textContent = email;
+  const w = $('welcome-line');
+  if (w){
+    const hour = new Date().getHours();
+    const greet = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+    w.textContent = `${greet}, ${name.split(' ')[0]}`;
+  }
+}
+
+function redirectToLogin(reason){
+  console.warn('[dashboard] redirecting to login:', reason);
+  try{ window.location.replace('index.html'); }catch(_){}
+}
+
+supabase.auth.onAuthStateChange((event) => {
+  if (event === 'SIGNED_OUT') redirectToLogin('signed-out');
+});
+
+boot();
+</script>
+
+</body>
+</html>
